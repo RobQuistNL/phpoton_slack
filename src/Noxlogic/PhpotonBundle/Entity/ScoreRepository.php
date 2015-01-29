@@ -3,6 +3,7 @@
 namespace Noxlogic\PhpotonBundle\Entity;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Query\ResultSetMapping;
 
 /**
  * ScoreRepository
@@ -12,4 +13,33 @@ use Doctrine\ORM\EntityRepository;
  */
 class ScoreRepository extends EntityRepository
 {
+
+    function count() {
+        $query = $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->getQuery();
+        return $query->getSingleScalarResult();
+    }
+
+    function getTop($top = 25) {
+        $query = $this->createQueryBuilder('s')
+            ->select(array('s', 'COUNT(s.id) AS points'))
+            ->groupBy('s.user')
+            ->orderBy('points', 'DESC')
+            ->setMaxResults($top)
+            ->getQuery();
+
+        return $query->getResult();
+    }
+
+    function getUserScore($user) {
+        $query = $this->createQueryBuilder('s')
+            ->select('COUNT(s.id) AS points')
+            ->groupBy('s.user')
+            ->where('s.user = :user')
+            ->getQuery();
+        $query->setParameter('user', $user);
+        return $query->getSingleScalarResult();
+    }
+
 }

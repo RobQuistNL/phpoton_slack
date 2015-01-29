@@ -12,4 +12,27 @@ use Doctrine\ORM\EntityRepository;
  */
 class QuestionRepository extends EntityRepository
 {
+
+    function count() {
+        $query = $this->createQueryBuilder('q')
+            ->select('COUNT(q.id)')
+            ->getQuery();
+        return $query->getSingleScalarResult();
+    }
+
+    /**
+     * @return Question
+     */
+    function random() {
+        // F*& it, dql can't be registered from config.yml, and no time to figure out why
+        $this->getEntityManager()->getConfiguration()->addCustomNumericFunction('RAND', 'Noxlogic\PhpotonBundle\Doctrine\Rand');
+
+        $query = $this->createQueryBuilder('q')
+            ->addSelect('RAND() as HIDDEN rand')
+            ->orderBy('rand')
+            ->setMaxResults(1)
+            ->getQuery();
+        return $query->getSingleResult();
+    }
+
 }
