@@ -158,8 +158,9 @@ class Bot {
     protected function handleMessage($request) {
         // @TODO: Move commands to separate classes with CommandInterface
 
+        // @TODO: Only when message
         if ($this->current_question == null) {
-            $this->sendMessage("Please wait until we ask a question!\n");
+//            $this->sendMessage("Please wait until we ask a question!\n");
             return;
         }
 
@@ -171,6 +172,10 @@ class Bot {
             $this->sendMessage('Answered correctly by '.$user['name'].'! Score increased by one robo-point! **bliep**'.$this->randomEmoji());
 
             $this->increaseScore($request->user);
+
+            $points = $this->doctrine->getRepository('NoxlogicPhpotonBundle:Score')->getUserScore($request->user);
+            $this->sendMessage('Score for '.$user['name'].": ".$points." points!");
+
             $this->scheduleNextQuestion();
         }
     }
@@ -298,6 +303,8 @@ class Bot {
      */
     protected function scheduleNextQuestion()
     {
+        $this->sendMessage('Humans! Prepare for the next question...');
+
         $this->current_question = null;
         $this->next_question_timestamp = time() + rand(self::IDLE_MIN, self::IDLE_MAX);
     }
