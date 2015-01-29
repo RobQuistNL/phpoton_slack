@@ -1,0 +1,4 @@
+services:
+  phpoton.bot.service:
+    class: Noxlogic\PhpotonBundle\Service\Phpoton\Bot
+    arguments: [ @doctrine ]
